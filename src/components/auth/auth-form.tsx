@@ -1,0 +1,236 @@
+"use client"
+
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { useForm } from "react-hook-form"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { createClient } from "@/lib/supabase-client"
+import toast from "react-hot-toast"
+import Image from "next/image"
+
+interface AuthFormProps {
+  mode: "login" | "signup"
+}
+
+interface FormData {
+  email: string
+  password: string
+  fullName?: string
+  confirmPassword?: string
+}
+
+export function AuthForm({ mode }: AuthFormProps) {
+  const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
+  const supabase = createClient()
+  
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<FormData>()
+
+  const password = watch("password")
+
+  const onSubmit = async (data: FormData) => {
+    setIsLoading(true)
+    
+    try {
+      if (mode === "signup") {
+        const { error } = await supabase.auth.signUp({
+          email: data.email,
+          password: data.password,
+          options: {
+            data: {
+              full_name: data.fullName,
+            },
+          },
+        })
+        
+        if (error) throw error
+        
+        toast.success("Check your email for verification link!")
+        router.push("/login")
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: data.email,
+          password: data.password,
+        })
+        
+        if (error) throw error
+        
+        toast.success("Welcome back!")
+        router.push("/dashboard")
+      }
+    } catch (error: any) {
+      toast.error(error.message || "An error occurred")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const signInWithGoogle = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
+      
+      if (error) throw error
+    } catch (error: any) {
+      toast.error(error.message || "An error occurred")
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
+          <div className="text-center mb-8">
+            <Image
+              src="/images/taskify.png"
+              alt="Taskify Logo"
+              width={80}
+              height={80}
+              className="mx-auto mb-4 rounded-lg"
+            />
+            <h1 className="text-2xl font-bold">
+              {mode === "login" ? "Welcome Back" : "Create Account"}
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">
+              {mode === "login" 
+                ? "Sign in to your account" 
+                : "Sign up to get started with Taskify"
+              }
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {mode === "signup" && (
+              <div>
+                <Label htmlFor="fullName">Full Name</Label>
+                <Input
+                  id="fullName"
+                  type="text"
+                  {...register("fullName", { 
+                    required: mode === "signup" ? "Full name is required" : false 
+                  })}
+                  className="mt-1"
+                />
+                {errors.fullName && (
+                  <p className="text-red-500 text-sm mt-1">{errors.fullName.message}</p>
+                )}
+              </div>
+            )}
+
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                {...register("email", { 
+                  required: "Email is required",
+                  pattern: {
+                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                    message: "Invalid email address"
+                  }
+                })}
+                className="mt-1"
+              />
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                {...register("password", { 
+                  required: "Password is required",
+                  minLength: {
+                    value: 6,
+                    message: "Password must be at least 6 characters"
+                  }
+                })}
+                className="mt-1"
+              />
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+              )}
+            </div>
+
+            {mode === "signup" && (
+              <div>
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  {...register("confirmPassword", {
+                    required: "Please confirm your password",
+                    validate: (value) =>
+                      value === password || "Passwords do not match"
+                  })}
+                  className="mt-1"
+                />
+                {errors.confirmPassword && (
+                  <p className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>
+                )}
+              </div>
+            )}
+
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Loading..." : mode === "login" ? "Sign In" : "Sign Up"}
+            </Button>
+          </form>
+
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300 dark:border-gray-600" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white dark:bg-gray-800 text-gray-500">Or continue with</span>
+              </div>
+            </div>
+
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full mt-4"
+              onClick={signInWithGoogle}
+            >
+              <Image
+                src="/images/google.png"
+                alt="Google"
+                width={20}
+                height={20}
+                className="mr-2"
+              />
+              Google
+            </Button>
+          </div>
+
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              {mode === "login" ? "Don't have an account? " : "Already have an account? "}
+              <a
+                href={mode === "login" ? "/signup" : "/login"}
+                className="text-primary hover:underline"
+              >
+                {mode === "login" ? "Sign up" : "Sign in"}
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
