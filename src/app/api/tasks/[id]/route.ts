@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase-server";
 import { TaskService } from "@/lib/database";
-import type { Database } from "@/types/supabase";
+import { Database } from "@/lib/supabase";
 
 // Define Task row type
 type Task = Database["public"]["Tables"]["tasks"]["Row"];
