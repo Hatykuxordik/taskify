@@ -89,8 +89,6 @@ export async function PUT(request: NextRequest, context: RouteContext) {
       ...(is_pinned !== undefined && { is_pinned }),
     };
 
-    // Suppress TypeScript error for this line
-    // @ts-expect-error Supabase type inference issue with updateData
     const { data: note, error } = await supabase
       .from("notes")
       .update(updateData)
