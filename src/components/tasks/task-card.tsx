@@ -1,73 +1,98 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Task } from "@/lib/database"
-import { format } from "date-fns"
+import { useState } from "react";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Task } from "@/lib/database";
+import { format } from "date-fns";
 
 interface TaskCardProps {
-  task: Task
-  onEdit: (task: Task) => void
-  onDelete: (id: string) => void
-  onToggleStatus: (id: string, status: string) => void
+  task: Task;
+  onEdit: (task: Task) => void;
+  onDelete: (id: string) => void;
+  onToggleStatus: (id: string, status: string) => void;
 }
 
-export function TaskCard({ task, onEdit, onDelete, onToggleStatus }: TaskCardProps) {
-  const [isLoading, setIsLoading] = useState(false)
+export function TaskCard({
+  task,
+  onEdit,
+  onDelete,
+  onToggleStatus,
+}: TaskCardProps) {
+  const [isLoading, setIsLoading] = useState(false);
 
   const getPriorityColor = (priority: string | null) => {
     switch (priority) {
-      case 'high':
-        return 'destructive'
-      case 'medium':
-        return 'warning'
-      case 'low':
-        return 'secondary'
+      case "high":
+        return "destructive";
+      case "medium":
+        return "warning";
+      case "low":
+        return "secondary";
       default:
-        return 'outline'
+        return "outline";
     }
-  }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed':
-        return 'success'
-      case 'in-progress':
-        return 'warning'
-      case 'pending':
-        return 'secondary'
+      case "completed":
+        return "success";
+      case "in-progress":
+        return "warning";
+      case "pending":
+        return "secondary";
       default:
-        return 'outline'
+        return "outline";
     }
-  }
+  };
 
   const handleToggleStatus = async () => {
-    setIsLoading(true)
-    const newStatus = task.status === 'completed' ? 'pending' : 
-                     task.status === 'pending' ? 'in-progress' : 'completed'
-    await onToggleStatus(task.id, newStatus)
-    setIsLoading(false)
-  }
+    setIsLoading(true);
+    const newStatus =
+      task.status === "completed"
+        ? "pending"
+        : task.status === "pending"
+        ? "in-progress"
+        : "completed";
+    await onToggleStatus(task.id, newStatus);
+    setIsLoading(false);
+  };
 
-  const isOverdue = task.due_date && new Date(task.due_date) < new Date() && task.status !== 'completed'
+  const isOverdue =
+    task.due_date &&
+    new Date(task.due_date) < new Date() &&
+    task.status !== "completed";
 
   return (
-    <Card className={`transition-all hover:shadow-md ${task.status === 'completed' ? 'opacity-75' : ''} ${isOverdue ? 'border-red-200 dark:border-red-800' : ''}`}>
+    <Card
+      className={`transition-all hover:shadow-md ${
+        task.status === "completed" ? "opacity-75" : ""
+      } ${isOverdue ? "border-destructive/20 dark:border-destructive/80" : ""}`}
+    >
       <CardContent className="p-4">
         <div className="flex items-start justify-between mb-2">
-          <h3 className={`font-semibold ${task.status === 'completed' ? 'line-through text-muted-foreground' : ''}`}>
+          <h3
+            className={`font-semibold ${
+              task.status === "completed"
+                ? "line-through text-muted-foreground"
+                : ""
+            }`}
+          >
             {task.title}
           </h3>
           <div className="flex items-center space-x-1">
             {task.priority && (
-              <Badge variant={getPriorityColor(task.priority)} className="text-xs">
+              <Badge
+                variant={getPriorityColor(task.priority)}
+                className="text-xs"
+              >
                 {task.priority}
               </Badge>
             )}
             <Badge variant={getStatusColor(task.status)} className="text-xs">
-              {task.status.replace('-', ' ')}
+              {task.status.replace("-", " ")}
             </Badge>
           </div>
         </div>
@@ -86,14 +111,12 @@ export function TaskCard({ task, onEdit, onDelete, onToggleStatus }: TaskCardPro
               </span>
             )}
             {task.due_date && (
-              <span className={isOverdue ? 'text-red-500 font-medium' : ''}>
-                Due: {format(new Date(task.due_date), 'MMM dd, yyyy')}
+              <span className={isOverdue ? "text-destructive font-medium" : ""}>
+                Due: {format(new Date(task.due_date), "MMM dd, yyyy")}
               </span>
             )}
           </div>
-          <span>
-            {format(new Date(task.created_at), 'MMM dd')}
-          </span>
+          <span>{format(new Date(task.created_at), "MMM dd")}</span>
         </div>
       </CardContent>
 
@@ -105,14 +128,13 @@ export function TaskCard({ task, onEdit, onDelete, onToggleStatus }: TaskCardPro
             onClick={handleToggleStatus}
             disabled={isLoading}
           >
-            {task.status === 'completed' ? '↶ Reopen' : 
-             task.status === 'pending' ? '▶ Start' : '✓ Complete'}
+            {task.status === "completed"
+              ? "↶ Reopen"
+              : task.status === "pending"
+              ? "▶ Start"
+              : "✓ Complete"}
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onEdit(task)}
-          >
+          <Button variant="ghost" size="sm" onClick={() => onEdit(task)}>
             Edit
           </Button>
         </div>
@@ -120,12 +142,11 @@ export function TaskCard({ task, onEdit, onDelete, onToggleStatus }: TaskCardPro
           variant="ghost"
           size="sm"
           onClick={() => onDelete(task.id)}
-          className="text-destructive hover:text-destructive"
+          className="text-destructive"
         >
           Delete
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }
-

@@ -21,6 +21,10 @@
   --input: 214.3 31.8% 91.4%;
   --ring: 217.2 91.2% 59.8%;
   --radius: 0.5rem;
+  --success: 142.1 76.2% 36.3%;
+  --success-foreground: 355.7 100% 97.3%;
+  --warning: 48.4 95.3% 50.8%;
+  --warning-foreground: 222.2 47.4% 11.2%;
 }
 
 .dark {
@@ -43,6 +47,10 @@
   --border: 217.2 32.6% 17.5%;
   --input: 217.2 32.6% 17.5%;
   --ring: 217.6 91.2% 59.8%;
+  --success: 142.1 70.6% 45.3%;
+  --success-foreground: 355.7 100% 97.3%;
+  --warning: 48.4 95.3% 50.8%;
+  --warning-foreground: 222.2 47.4% 11.2%;
 }
 
 * {
@@ -60,12 +68,16 @@ body {
 }
 
 /* Smooth hover effects for interactive elements */
-button, a, [role="button"] {
+button,
+a,
+[role="button"] {
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-button:hover:not(:disabled), a:hover, [role="button"]:hover {
+button:hover:not(:disabled),
+a:hover,
+[role="button"]:hover {
   transform: translateY(-1px);
 }
 
@@ -76,13 +88,14 @@ button:hover:not(:disabled), a:hover, [role="button"]:hover {
 
 .card-hover:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 /* Focus states for accessibility */
-button:focus-visible, 
-input:focus-visible, 
-textarea:focus-visible, 
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
 select:focus-visible,
 a:focus-visible {
   outline: 2px solid hsl(var(--ring));
@@ -90,7 +103,8 @@ a:focus-visible {
 }
 
 /* Button press effect */
-button:active:not(:disabled), [role="button"]:active {
+button:active:not(:disabled),
+[role="button"]:active {
   transform: translateY(0px) scale(0.98);
 }
 
@@ -105,7 +119,7 @@ html {
     --border: 0 0% 0%;
     --ring: 0 0% 0%;
   }
-  
+
   .dark {
     --border: 0 0% 100%;
     --ring: 0 0% 100%;
@@ -114,21 +128,23 @@ html {
 
 /* Reduced motion for accessibility */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-  
+
   html {
     scroll-behavior: auto;
   }
 }
 
-
 /* Loading animations */
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -159,4 +175,3 @@ html {
 .animate-fade-in * {
   animation: none;
 }
-

@@ -59,8 +59,8 @@ export function Header({ user }: HeaderProps) {
     const isActive = pathname === href;
     return `text-sm font-medium transition-colors ${
       isActive
-        ? "text-[#fb649f] border-b-2 !border-[#fb649f]"
-        : "hover:text-[#fb649f]"
+        ? "text-primary border-b-2 !border-primary"
+        : "hover:text-primary"
     }`;
   };
 

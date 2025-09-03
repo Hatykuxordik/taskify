@@ -1,9 +1,14 @@
-import * as React from "react"
-import { cn } from "@/lib/utils"
+import * as React from "react";
+import { cn } from "@/lib/utils";
 
-export interface BadgeProps
-  extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: "default" | "secondary" | "destructive" | "outline" | "success" | "warning"
+export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
+  variant?:
+    | "default"
+    | "secondary"
+    | "destructive"
+    | "outline"
+    | "success"
+    | "warning";
 }
 
 function Badge({ className, variant = "default", ...props }: BadgeProps) {
@@ -19,17 +24,16 @@ function Badge({ className, variant = "default", ...props }: BadgeProps) {
           "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80":
             variant === "destructive",
           "text-foreground": variant === "outline",
-          "border-transparent bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300":
+          "border-transparent bg-[hsl(var(--success))] text-[hsl(var(--success-foreground))]":
             variant === "success",
-          "border-transparent bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300":
+          "border-transparent bg-[hsl(var(--warning))] text-[hsl(var(--warning-foreground))]":
             variant === "warning",
         },
         className
       )}
       {...props}
     />
-  )
+  );
 }
 
-export { Badge }
-
+export { Badge };
