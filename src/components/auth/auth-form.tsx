@@ -93,9 +93,9 @@ export function AuthForm({ mode }: AuthFormProps) {
   }, [supabase]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
+        <div className="bg-card rounded-xl shadow-lg p-8">
           {/* Header */}
           <div className="text-center mb-8">
             <Image
@@ -108,7 +108,7 @@ export function AuthForm({ mode }: AuthFormProps) {
             <h1 className="text-2xl font-bold">
               {mode === "login" ? "Welcome Back" : "Create Account"}
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-2">
+            <p className="text-muted-foreground mt-2">
               {mode === "login"
                 ? "Sign in to your account"
                 : "Sign up to get started with Taskify"}
@@ -212,10 +212,10 @@ export function AuthForm({ mode }: AuthFormProps) {
           <div className="mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300 dark:border-gray-600" />
+                <div className="w-full border-t border-border" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white dark:bg-gray-800 text-gray-500">
+                <span className="px-2 bg-card text-muted-foreground">
                   Or continue with
                 </span>
               </div>
@@ -241,7 +241,7 @@ export function AuthForm({ mode }: AuthFormProps) {
 
           {/* Footer */}
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-muted-foreground">
               {mode === "login"
                 ? "Don't have an account? "
                 : "Already have an account? "}
