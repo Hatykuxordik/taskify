@@ -3,6 +3,7 @@
 ## Supabase Configuration
 
 ### 1. Access Your Supabase Project
+
 - Log in to [Supabase Dashboard](https://supabase.com)
 - Navigate to your project using the URL: `https://nohkflhdjuhflonzevzd.supabase.co`
 
@@ -34,9 +35,9 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
-CREATE TRIGGER update_tasks_updated_at 
-    BEFORE UPDATE ON tasks 
-    FOR EACH ROW 
+CREATE TRIGGER update_tasks_updated_at
+    BEFORE UPDATE ON tasks
+    FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
 -- Enable Row Level Security
@@ -75,7 +76,7 @@ ALTER TABLE task_shares ENABLE ROW LEVEL SECURITY;
 -- Policies for task_shares
 CREATE POLICY "Users can view shares for their tasks" ON task_shares
     FOR SELECT USING (
-        shared_by = auth.uid() OR 
+        shared_by = auth.uid() OR
         shared_with_email = (SELECT email FROM auth.users WHERE id = auth.uid())
     );
 
@@ -109,24 +110,16 @@ ALTER PUBLICATION supabase_realtime ADD TABLE tasks;
 
 ### 6. Test Connection
 
-You can test the connection using the provided credentials in your `.env.local` file:
-
-```
-NEXT_PUBLIC_SUPABASE_URL=https://nohkflhdjuhflonzevzd.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5vaGtmbGhkanVoZmxvbnpldnpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMDg2OTUsImV4cCI6MjA3MTU4NDY5NX0.1yXsucmQ7wxSYJ-Ud_dPdrcwxCfeuaX8m6l9OV3-RGM
-```
-
 ### 7. Verify Setup
 
 After running the SQL commands, verify that:
+
 - Tables are created successfully
 - RLS policies are active
 - Triggers are working
 - Google OAuth is configured
 
 The database is now ready for the Taskify application!
-
-
 
 ### 8. Create Notes Table
 
@@ -144,9 +137,9 @@ CREATE TABLE notes (
 );
 
 -- Create updated_at trigger for notes
-CREATE TRIGGER update_notes_updated_at 
-    BEFORE UPDATE ON notes 
-    FOR EACH ROW 
+CREATE TRIGGER update_notes_updated_at
+    BEFORE UPDATE ON notes
+    FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
 -- Enable Row Level Security for notes
@@ -203,4 +196,3 @@ CREATE POLICY "Users can delete their task-note relationships" ON task_notes
         EXISTS (SELECT 1 FROM notes WHERE id = note_id AND user_id = auth.uid())
     );
 ```
-

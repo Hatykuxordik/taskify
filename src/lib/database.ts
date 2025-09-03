@@ -1,470 +1,473 @@
-import { createClient } from './supabase-client'
-import { Database } from './supabase'
+import { createClient } from "./supabase-client";
+import { Database, RealtimePostgresChangesPayload } from "./supabase";
 
-export type Task = Database['public']['Tables']['tasks']['Row']
-export type TaskInsert = Database['public']['Tables']['tasks']['Insert']
-export type TaskUpdate = Database['public']['Tables']['tasks']['Update']
+export type Task = Database["public"]["Tables"]["tasks"]["Row"];
+export type TaskInsert = Database["public"]["Tables"]["tasks"]["Insert"];
+export type TaskUpdate = Database["public"]["Tables"]["tasks"]["Update"];
 
 export type Note = {
-  id: string
-  user_id: string
-  title: string
-  content: string
-  tags: string[] | null
-  is_pinned: boolean
-  created_at: string
-  updated_at: string
-}
+  id: string;
+  user_id: string;
+  title: string;
+  content: string;
+  tags: string[] | null;
+  is_pinned: boolean;
+  created_at: string;
+  updated_at: string;
+};
 
-export type NoteInsert = Omit<Note, 'id' | 'created_at' | 'updated_at'>
-export type NoteUpdate = Partial<Omit<Note, 'id' | 'user_id' | 'created_at' | 'updated_at'>>
+export type NoteInsert = Omit<Note, "id" | "created_at" | "updated_at">;
+export type NoteUpdate = Partial<
+  Omit<Note, "id" | "user_id" | "created_at" | "updated_at">
+>;
 
 export class TaskService {
-  private supabase = createClient()
+  private supabase = createClient();
 
   async getTasks(userId?: string) {
     const query = this.supabase
-      .from('tasks')
-      .select('*')
-      .order('created_at', { ascending: false })
+      .from("tasks")
+      .select("*")
+      .order("created_at", { ascending: false });
 
     if (userId) {
-      query.eq('user_id', userId)
+      query.eq("user_id", userId);
     }
 
-    const { data, error } = await query
+    const { data, error } = await query;
 
-    if (error) throw error
-    return data
+    if (error) throw error;
+    return data;
   }
 
   async getTaskById(id: string) {
     const { data, error } = await this.supabase
-      .from('tasks')
-      .select('*')
-      .eq('id', id)
-      .single()
+      .from("tasks")
+      .select("*")
+      .eq("id", id)
+      .single();
 
-    if (error) throw error
-    return data
+    if (error) throw error;
+    return data;
   }
 
-  async createTask(task: Omit<TaskInsert, 'id' | 'created_at' | 'updated_at'>) {
+  async createTask(task: Omit<TaskInsert, "id" | "created_at" | "updated_at">) {
     const { data, error } = await this.supabase
-      .from('tasks')
+      .from("tasks")
       .insert(task)
       .select()
-      .single()
+      .single();
 
-    if (error) throw error
-    return data
+    if (error) throw error;
+    return data;
   }
 
   async updateTask(id: string, updates: TaskUpdate) {
     const { data, error } = await this.supabase
-      .from('tasks')
+      .from("tasks")
       .update(updates)
-      .eq('id', id)
+      .eq("id", id)
       .select()
-      .single()
+      .single();
 
-    if (error) throw error
-    return data
+    if (error) throw error;
+    return data;
   }
 
   async deleteTask(id: string) {
-    const { error } = await this.supabase
-      .from('tasks')
-      .delete()
-      .eq('id', id)
+    const { error } = await this.supabase.from("tasks").delete().eq("id", id);
 
-    if (error) throw error
+    if (error) throw error;
   }
 
   async getTasksByStatus(status: string, userId?: string) {
     const query = this.supabase
-      .from('tasks')
-      .select('*')
-      .eq('status', status)
-      .order('created_at', { ascending: false })
+      .from("tasks")
+      .select("*")
+      .eq("status", status)
+      .order("created_at", { ascending: false });
 
     if (userId) {
-      query.eq('user_id', userId)
+      query.eq("user_id", userId);
     }
 
-    const { data, error } = await query
+    const { data, error } = await query;
 
-    if (error) throw error
-    return data
+    if (error) throw error;
+    return data;
   }
 
   async getTasksByCategory(category: string, userId?: string) {
     const query = this.supabase
-      .from('tasks')
-      .select('*')
-      .eq('category', category)
-      .order('created_at', { ascending: false })
+      .from("tasks")
+      .select("*")
+      .eq("category", category)
+      .order("created_at", { ascending: false });
 
     if (userId) {
-      query.eq('user_id', userId)
+      query.eq("user_id", userId);
     }
 
-    const { data, error } = await query
+    const { data, error } = await query;
 
-    if (error) throw error
-    return data
+    if (error) throw error;
+    return data;
   }
 
   async searchTasks(searchTerm: string, userId?: string) {
     const query = this.supabase
-      .from('tasks')
-      .select('*')
+      .from("tasks")
+      .select("*")
       .or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`)
-      .order('created_at', { ascending: false })
+      .order("created_at", { ascending: false });
 
     if (userId) {
-      query.eq('user_id', userId)
+      query.eq("user_id", userId);
     }
 
-    const { data, error } = await query
+    const { data, error } = await query;
 
-    if (error) throw error
-    return data
+    if (error) throw error;
+    return data;
   }
 
   async getTaskStats(userId?: string) {
-    const query = this.supabase
-      .from('tasks')
-      .select('status')
+    const query = this.supabase.from("tasks").select("status");
 
     if (userId) {
-      query.eq('user_id', userId)
+      query.eq("user_id", userId);
     }
 
-    const { data, error } = await query
+    const { data, error } = await query;
 
-    if (error) throw error
+    if (error) throw error;
 
     const stats = {
       total: data.length,
-      pending: data.filter(task => task.status === 'pending').length,
-      inProgress: data.filter(task => task.status === 'in-progress').length,
-      completed: data.filter(task => task.status === 'completed').length,
-    }
+      pending: data.filter((task) => task.status === "pending").length,
+      inProgress: data.filter((task) => task.status === "in-progress").length,
+      completed: data.filter((task) => task.status === "completed").length,
+    };
 
-    return stats
+    return stats;
   }
 
   // Real-time subscription
-  subscribeToTasks(userId: string, callback: (payload: any) => void) {
+  subscribeToTasks(
+    userId: string,
+    callback: (payload: RealtimePostgresChangesPayload<Task>) => void
+  ) {
     return this.supabase
-      .channel('tasks')
+      .channel("tasks")
       .on(
-        'postgres_changes',
+        "postgres_changes",
         {
-          event: '*',
-          schema: 'public',
-          table: 'tasks',
+          event: "*",
+          schema: "public",
+          table: "tasks",
           filter: `user_id=eq.${userId}`,
         },
         callback
       )
-      .subscribe()
+      .subscribe();
   }
 }
 
 export class NoteService {
-  private supabase = createClient()
+  private supabase = createClient();
 
   async getNotes(userId?: string) {
     const query = this.supabase
-      .from('notes')
-      .select('*')
-      .order('is_pinned', { ascending: false })
-      .order('updated_at', { ascending: false })
+      .from("notes")
+      .select("*")
+      .order("is_pinned", { ascending: false })
+      .order("updated_at", { ascending: false });
 
     if (userId) {
-      query.eq('user_id', userId)
+      query.eq("user_id", userId);
     }
 
-    const { data, error } = await query
+    const { data, error } = await query;
 
-    if (error) throw error
-    return data as Note[]
+    if (error) throw error;
+    return data as Note[];
   }
 
   async getNoteById(id: string) {
     const { data, error } = await this.supabase
-      .from('notes')
-      .select('*')
-      .eq('id', id)
-      .single()
+      .from("notes")
+      .select("*")
+      .eq("id", id)
+      .single();
 
-    if (error) throw error
-    return data as Note
+    if (error) throw error;
+    return data as Note;
   }
 
   async createNote(note: NoteInsert) {
     const { data, error } = await this.supabase
-      .from('notes')
+      .from("notes")
       .insert(note)
       .select()
-      .single()
+      .single();
 
-    if (error) throw error
-    return data as Note
+    if (error) throw error;
+    return data as Note;
   }
 
   async updateNote(id: string, updates: NoteUpdate) {
     const { data, error } = await this.supabase
-      .from('notes')
+      .from("notes")
       .update(updates)
-      .eq('id', id)
+      .eq("id", id)
       .select()
-      .single()
+      .single();
 
-    if (error) throw error
-    return data as Note
+    if (error) throw error;
+    return data as Note;
   }
 
   async deleteNote(id: string) {
-    const { error } = await this.supabase
-      .from('notes')
-      .delete()
-      .eq('id', id)
+    const { error } = await this.supabase.from("notes").delete().eq("id", id);
 
-    if (error) throw error
+    if (error) throw error;
   }
 
   async searchNotes(searchTerm: string, userId?: string) {
     const query = this.supabase
-      .from('notes')
-      .select('*')
+      .from("notes")
+      .select("*")
       .or(`title.ilike.%${searchTerm}%,content.ilike.%${searchTerm}%`)
-      .order('updated_at', { ascending: false })
+      .order("updated_at", { ascending: false });
 
     if (userId) {
-      query.eq('user_id', userId)
+      query.eq("user_id", userId);
     }
 
-    const { data, error } = await query
+    const { data, error } = await query;
 
-    if (error) throw error
-    return data as Note[]
+    if (error) throw error;
+    return data as Note[];
   }
 
   async getNotesByTag(tag: string, userId?: string) {
     const query = this.supabase
-      .from('notes')
-      .select('*')
-      .contains('tags', [tag])
-      .order('updated_at', { ascending: false })
+      .from("notes")
+      .select("*")
+      .contains("tags", [tag])
+      .order("updated_at", { ascending: false });
 
     if (userId) {
-      query.eq('user_id', userId)
+      query.eq("user_id", userId);
     }
 
-    const { data, error } = await query
+    const { data, error } = await query;
 
-    if (error) throw error
-    return data as Note[]
+    if (error) throw error;
+    return data as Note[];
   }
 
   async togglePin(id: string) {
-    const note = await this.getNoteById(id)
-    return this.updateNote(id, { is_pinned: !note.is_pinned })
+    const note = await this.getNoteById(id);
+    return this.updateNote(id, { is_pinned: !note.is_pinned });
   }
 
   // Real-time subscription
-  subscribeToNotes(userId: string, callback: (payload: any) => void) {
+  subscribeToNotes(
+    userId: string,
+    callback: (payload: RealtimePostgresChangesPayload<Note>) => void
+  ) {
     return this.supabase
-      .channel('notes')
+      .channel("notes")
       .on(
-        'postgres_changes',
+        "postgres_changes",
         {
-          event: '*',
-          schema: 'public',
-          table: 'notes',
+          event: "*",
+          schema: "public",
+          table: "notes",
           filter: `user_id=eq.${userId}`,
         },
         callback
       )
-      .subscribe()
+      .subscribe();
   }
 }
 
 // Local storage operations for guest mode
 export class LocalTaskService {
-  private storageKey = 'taskify_tasks'
+  private storageKey = "taskify_tasks";
 
   getTasks(): Task[] {
-    if (typeof window === 'undefined') return []
-    
-    const stored = localStorage.getItem(this.storageKey)
-    return stored ? JSON.parse(stored) : []
+    if (typeof window === "undefined") return [];
+
+    const stored = localStorage.getItem(this.storageKey);
+    return stored ? JSON.parse(stored) : [];
   }
 
   saveTasks(tasks: Task[]) {
-    if (typeof window === 'undefined') return
-    
-    localStorage.setItem(this.storageKey, JSON.stringify(tasks))
+    if (typeof window === "undefined") return;
+
+    localStorage.setItem(this.storageKey, JSON.stringify(tasks));
   }
 
-  createTask(task: Omit<Task, 'id' | 'created_at' | 'updated_at'>): Task {
-    const tasks = this.getTasks()
+  createTask(task: Omit<Task, "id" | "created_at" | "updated_at">): Task {
+    const tasks = this.getTasks();
     const newTask: Task = {
       ...task,
       id: crypto.randomUUID(),
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-    }
-    
-    tasks.unshift(newTask)
-    this.saveTasks(tasks)
-    return newTask
+    };
+
+    tasks.unshift(newTask);
+    this.saveTasks(tasks);
+    return newTask;
   }
 
   updateTask(id: string, updates: Partial<Task>): Task | null {
-    const tasks = this.getTasks()
-    const index = tasks.findIndex(task => task.id === id)
-    
-    if (index === -1) return null
-    
+    const tasks = this.getTasks();
+    const index = tasks.findIndex((task) => task.id === id);
+
+    if (index === -1) return null;
+
     tasks[index] = {
       ...tasks[index],
       ...updates,
       updated_at: new Date().toISOString(),
-    }
-    
-    this.saveTasks(tasks)
-    return tasks[index]
+    };
+
+    this.saveTasks(tasks);
+    return tasks[index];
   }
 
   deleteTask(id: string): boolean {
-    const tasks = this.getTasks()
-    const filteredTasks = tasks.filter(task => task.id !== id)
-    
-    if (filteredTasks.length === tasks.length) return false
-    
-    this.saveTasks(filteredTasks)
-    return true
+    const tasks = this.getTasks();
+    const filteredTasks = tasks.filter((task) => task.id !== id);
+
+    if (filteredTasks.length === tasks.length) return false;
+
+    this.saveTasks(filteredTasks);
+    return true;
   }
 
   getTaskStats() {
-    const tasks = this.getTasks()
-    
+    const tasks = this.getTasks();
+
     return {
       total: tasks.length,
-      pending: tasks.filter(task => task.status === 'pending').length,
-      inProgress: tasks.filter(task => task.status === 'in-progress').length,
-      completed: tasks.filter(task => task.status === 'completed').length,
-    }
+      pending: tasks.filter((task) => task.status === "pending").length,
+      inProgress: tasks.filter((task) => task.status === "in-progress").length,
+      completed: tasks.filter((task) => task.status === "completed").length,
+    };
   }
 
   searchTasks(searchTerm: string): Task[] {
-    const tasks = this.getTasks()
-    const term = searchTerm.toLowerCase()
-    
-    return tasks.filter(task => 
-      task.title.toLowerCase().includes(term) ||
-      (task.description && task.description.toLowerCase().includes(term))
-    )
+    const tasks = this.getTasks();
+    const term = searchTerm.toLowerCase();
+
+    return tasks.filter(
+      (task) =>
+        task.title.toLowerCase().includes(term) ||
+        (task.description && task.description.toLowerCase().includes(term))
+    );
   }
 }
 
 export class LocalNoteService {
-  private storageKey = 'taskify_notes'
+  private storageKey = "taskify_notes";
 
   getNotes(): Note[] {
-    if (typeof window === 'undefined') return []
-    
-    const stored = localStorage.getItem(this.storageKey)
-    const notes = stored ? JSON.parse(stored) : []
-    
+    if (typeof window === "undefined") return [];
+
+    const stored = localStorage.getItem(this.storageKey);
+    const notes = stored ? JSON.parse(stored) : [];
+
     // Sort by pinned first, then by updated_at
     return notes.sort((a: Note, b: Note) => {
-      if (a.is_pinned && !b.is_pinned) return -1
-      if (!a.is_pinned && b.is_pinned) return 1
-      return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
-    })
+      if (a.is_pinned && !b.is_pinned) return -1;
+      if (!a.is_pinned && b.is_pinned) return 1;
+      return (
+        new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+      );
+    });
   }
 
   saveNotes(notes: Note[]) {
-    if (typeof window === 'undefined') return
-    
-    localStorage.setItem(this.storageKey, JSON.stringify(notes))
+    if (typeof window === "undefined") return;
+
+    localStorage.setItem(this.storageKey, JSON.stringify(notes));
   }
 
-  createNote(note: Omit<Note, 'id' | 'created_at' | 'updated_at'>): Note {
-    const notes = this.getNotes()
+  createNote(note: Omit<Note, "id" | "created_at" | "updated_at">): Note {
+    const notes = this.getNotes();
     const newNote: Note = {
       ...note,
       id: crypto.randomUUID(),
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-    }
-    
-    notes.unshift(newNote)
-    this.saveNotes(notes)
-    return newNote
+    };
+
+    notes.unshift(newNote);
+    this.saveNotes(notes);
+    return newNote;
   }
 
   updateNote(id: string, updates: Partial<Note>): Note | null {
-    const notes = this.getNotes()
-    const index = notes.findIndex(note => note.id === id)
-    
-    if (index === -1) return null
-    
+    const notes = this.getNotes();
+    const index = notes.findIndex((note) => note.id === id);
+
+    if (index === -1) return null;
+
     notes[index] = {
       ...notes[index],
       ...updates,
       updated_at: new Date().toISOString(),
-    }
-    
-    this.saveNotes(notes)
-    return notes[index]
+    };
+
+    this.saveNotes(notes);
+    return notes[index];
   }
 
   deleteNote(id: string): boolean {
-    const notes = this.getNotes()
-    const filteredNotes = notes.filter(note => note.id !== id)
-    
-    if (filteredNotes.length === notes.length) return false
-    
-    this.saveNotes(filteredNotes)
-    return true
+    const notes = this.getNotes();
+    const filteredNotes = notes.filter((note) => note.id !== id);
+
+    if (filteredNotes.length === notes.length) return false;
+
+    this.saveNotes(filteredNotes);
+    return true;
   }
 
   searchNotes(searchTerm: string): Note[] {
-    const notes = this.getNotes()
-    const term = searchTerm.toLowerCase()
-    
-    return notes.filter(note => 
-      note.title.toLowerCase().includes(term) ||
-      note.content.toLowerCase().includes(term) ||
-      (note.tags && note.tags.some(tag => tag.toLowerCase().includes(term)))
-    )
+    const notes = this.getNotes();
+    const term = searchTerm.toLowerCase();
+
+    return notes.filter(
+      (note) =>
+        note.title.toLowerCase().includes(term) ||
+        note.content.toLowerCase().includes(term) ||
+        (note.tags && note.tags.some((tag) => tag.toLowerCase().includes(term)))
+    );
   }
 
   getNotesByTag(tag: string): Note[] {
-    const notes = this.getNotes()
-    return notes.filter(note => note.tags && note.tags.includes(tag))
+    const notes = this.getNotes();
+    return notes.filter((note) => note.tags && note.tags.includes(tag));
   }
 
   togglePin(id: string): Note | null {
-    const notes = this.getNotes()
-    const index = notes.findIndex(note => note.id === id)
-    
-    if (index === -1) return null
-    
+    const notes = this.getNotes();
+    const index = notes.findIndex((note) => note.id === id);
+
+    if (index === -1) return null;
+
     notes[index] = {
       ...notes[index],
       is_pinned: !notes[index].is_pinned,
       updated_at: new Date().toISOString(),
-    }
-    
-    this.saveNotes(notes)
-    return notes[index]
+    };
+
+    this.saveNotes(notes);
+    return notes[index];
   }
 }
-
