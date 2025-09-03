@@ -56,6 +56,7 @@ export type Database = {
           tags: string[] | null;
           is_pinned: boolean;
           created_at: string;
+          updated_at: string;
         };
         Insert: {
           id?: string;
@@ -65,6 +66,7 @@ export type Database = {
           tags?: string[] | null;
           is_pinned?: boolean;
           created_at?: string;
+          updated_at?: string;
         };
         Update: {
           title?: string;

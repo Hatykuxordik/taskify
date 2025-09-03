@@ -27,43 +27,48 @@ export default function Home() {
 
         <div className="grid md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
           <div className="space-y-8">
-            <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
+            <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg card-hover">
               <h2 className="text-2xl font-semibold mb-6 text-center">Get Started</h2>
               <div className="space-y-4">
                 <Link href="/signup" className="block">
-                  <Button className="w-full h-12 text-lg">
+                  <Button className="w-full h-12 text-lg cursor-pointer hover:shadow-lg transition-all duration-200">
                     Sign Up
                   </Button>
                 </Link>
                 <Link href="/login" className="block">
-                  <Button variant="outline" className="w-full h-12 text-lg">
+                  <Button variant="outline" className="w-full h-12 text-lg cursor-pointer hover:shadow-lg transition-all duration-200">
                     Sign In
                   </Button>
                 </Link>
                 <Link href="/guest" className="block">
-                  <Button variant="secondary" className="w-full h-12 text-lg">
+                  <Button variant="secondary" className="w-full h-12 text-lg cursor-pointer hover:shadow-lg transition-all duration-200">
                     Continue as Guest
+                  </Button>
+                </Link>
+                <Link href="/dashboard" className="block">
+                  <Button variant="default" className="w-full h-12 text-lg cursor-pointer hover:shadow-lg transition-all duration-200 bg-primary hover:bg-primary/90">
+                    Continue to Dashboard
                   </Button>
                 </Link>
               </div>
             </div>
 
-            <div className="text-center">
+            <div className="text-center animate-fade-in">
               <h3 className="text-lg font-semibold mb-4">Key Features</h3>
               <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg card-hover">
                   <div className="font-medium">Task Management</div>
                   <div className="text-gray-600 dark:text-gray-400">Create, edit, and organize</div>
                 </div>
-                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg card-hover">
                   <div className="font-medium">Real-time Sync</div>
                   <div className="text-gray-600 dark:text-gray-400">Access anywhere</div>
                 </div>
-                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg card-hover">
                   <div className="font-medium">Analytics</div>
                   <div className="text-gray-600 dark:text-gray-400">Track productivity</div>
                 </div>
-                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg card-hover">
                   <div className="font-medium">Collaboration</div>
                   <div className="text-gray-600 dark:text-gray-400">Share with team</div>
                 </div>

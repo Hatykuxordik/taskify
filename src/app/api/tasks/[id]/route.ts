@@ -13,7 +13,7 @@ export async function GET(
   const { id } = await context.params; // ✅ await params
 
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const {
       data: { user },
       error: authError,
@@ -49,7 +49,7 @@ export async function PUT(
   const { id } = await context.params;
 
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const {
       data: { user },
       error: authError,
@@ -97,7 +97,7 @@ export async function DELETE(
   const { id } = await context.params;
 
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const {
       data: { user },
       error: authError,

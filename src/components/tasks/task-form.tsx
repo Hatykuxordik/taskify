@@ -1,32 +1,37 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useForm } from "react-hook-form"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select } from "@/components/ui/select"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Task } from "@/lib/database"
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select } from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Task } from "@/lib/database";
 
 interface TaskFormProps {
-  task?: Task | null
-  onSubmit: (data: TaskFormData) => void
-  onCancel: () => void
-  isLoading?: boolean
+  task?: Task | null;
+  onSubmit: (data: TaskFormData) => void;
+  onCancel: () => void;
+  isLoading?: boolean;
 }
 
 export interface TaskFormData {
-  title: string
-  description: string
-  status: 'pending' | 'in-progress' | 'completed'
-  category: string
-  due_date: string
-  priority: 'low' | 'medium' | 'high' | null
+  title: string;
+  description: string;
+  status: "pending" | "in-progress" | "completed";
+  category: string;
+  due_date: string;
+  priority: "low" | "medium" | "high" | null;
 }
 
-export function TaskForm({ task, onSubmit, onCancel, isLoading = false }: TaskFormProps) {
+export function TaskForm({
+  task,
+  onSubmit,
+  onCancel,
+  isLoading = false,
+}: TaskFormProps) {
   const {
     register,
     handleSubmit,
@@ -34,40 +39,44 @@ export function TaskForm({ task, onSubmit, onCancel, isLoading = false }: TaskFo
     formState: { errors },
   } = useForm<TaskFormData>({
     defaultValues: {
-      title: task?.title || '',
-      description: task?.description || '',
-      status: task?.status || 'pending',
-      category: task?.category || '',
-      due_date: task?.due_date ? new Date(task.due_date).toISOString().split('T')[0] : '',
+      title: task?.title || "",
+      description: task?.description || "",
+      status: task?.status || "pending",
+      category: task?.category || "",
+      due_date: task?.due_date
+        ? new Date(task.due_date).toISOString().split("T")[0]
+        : "",
       priority: task?.priority || null,
-    }
-  })
+    },
+  });
 
   useEffect(() => {
     if (task) {
       reset({
         title: task.title,
-        description: task.description || '',
+        description: task.description || "",
         status: task.status,
-        category: task.category || '',
-        due_date: task.due_date ? new Date(task.due_date).toISOString().split('T')[0] : '',
+        category: task.category || "",
+        due_date: task.due_date
+          ? new Date(task.due_date).toISOString().split("T")[0]
+          : "",
         priority: task.priority,
-      })
+      });
     }
-  }, [task, reset])
+  }, [task, reset]);
 
   const handleFormSubmit = (data: TaskFormData) => {
     onSubmit({
       ...data,
-      due_date: data.due_date ? new Date(data.due_date).toISOString() : '',
-      priority: data.priority === '' ? null : data.priority,
-    })
-  }
+      due_date: data.due_date ? new Date(data.due_date).toISOString() : "",
+      priority: data.priority || null,
+    });
+  };
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle>{task ? 'Edit Task' : 'Create New Task'}</CardTitle>
+        <CardTitle>{task ? "Edit Task" : "Create New Task"}</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
@@ -80,7 +89,9 @@ export function TaskForm({ task, onSubmit, onCancel, isLoading = false }: TaskFo
               placeholder="Enter task title"
             />
             {errors.title && (
-              <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>
+              <p className="text-red-500 text-sm mt-1">
+                {errors.title.message}
+              </p>
             )}
           </div>
 
@@ -98,11 +109,7 @@ export function TaskForm({ task, onSubmit, onCancel, isLoading = false }: TaskFo
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="status">Status</Label>
-              <Select
-                id="status"
-                {...register("status")}
-                className="mt-1"
-              >
+              <Select id="status" {...register("status")} className="mt-1">
                 <option value="pending">Pending</option>
                 <option value="in-progress">In Progress</option>
                 <option value="completed">Completed</option>
@@ -111,11 +118,7 @@ export function TaskForm({ task, onSubmit, onCancel, isLoading = false }: TaskFo
 
             <div>
               <Label htmlFor="priority">Priority</Label>
-              <Select
-                id="priority"
-                {...register("priority")}
-                className="mt-1"
-              >
+              <Select id="priority" {...register("priority")} className="mt-1">
                 <option value="">No Priority</option>
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
@@ -162,6 +165,5 @@ export function TaskForm({ task, onSubmit, onCancel, isLoading = false }: TaskFo
         </form>
       </CardContent>
     </Card>
-  )
+  );
 }
-

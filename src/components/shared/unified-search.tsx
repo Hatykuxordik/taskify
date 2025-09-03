@@ -107,7 +107,7 @@ export function UnifiedSearch({
           const taskService = new TaskService();
           const noteService = new NoteService();
 
-          const [tasks, notes] = await Promise.all([
+          const [tasks, notes]: [Task[], Note[]] = await Promise.all([
             taskService.searchTasks(term, user.id),
             noteService.searchNotes(term, user.id),
           ]);

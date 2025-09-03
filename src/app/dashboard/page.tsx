@@ -4,14 +4,15 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Header } from "@/components/layout/header";
 import { TaskList } from "@/components/tasks/task-list";
+import Analytics from "@/components/analytics/analytics";
 import { TaskForm, TaskFormData } from "@/components/tasks/task-form";
 import { TaskService, LocalTaskService, Task } from "@/lib/database";
 import { createClient } from "@/lib/supabase-client";
 import toast from "react-hot-toast";
 import type { User } from "@supabase/supabase-js";
 
-// Allow string literal types for task status if you have enums in DB
-type TaskStatus = "todo" | "in_progress" | "done" | string;
+// Task status type matching database schema
+type TaskStatus = "pending" | "in-progress" | "completed";
 
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null);
@@ -79,7 +80,6 @@ export default function DashboardPage() {
       if (isGuestMode) {
         const localService = taskService as LocalTaskService;
         localService.createTask({
-          user_id: "guest",
           title: data.title,
           description: data.description,
           status: data.status,
@@ -249,13 +249,16 @@ export default function DashboardPage() {
             />
           </div>
         ) : (
-          <TaskList
-            tasks={tasks}
-            onEdit={handleEdit}
-            onDelete={handleDeleteTask}
-            onToggleStatus={handleToggleStatus}
-            onCreateNew={() => setShowForm(true)}
-          />
+          <>
+            <TaskList
+              tasks={tasks}
+              onEdit={handleEdit}
+              onDelete={handleDeleteTask}
+              onToggleStatus={handleToggleStatus}
+              onCreateNew={() => setShowForm(true)}
+            />
+            <Analytics tasks={tasks} />
+          </>
         )}
       </main>
     </div>
