@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase-server";
-import type { Database } from "@/types/supabase"; // <-- define types with Supabase gen
+import type { Database } from "@/lib/supabase";
 
 // Define table row type (from supabase types)
 type Note = Database["public"]["Tables"]["notes"]["Row"];
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Get current user
     const {
@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Get current user
     const {
@@ -87,7 +87,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { data: note, error } = (await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: note, error } = (await (supabase as any)
       .from("notes")
       .insert({
         user_id: user.id,

@@ -77,7 +77,6 @@ export default function NotesPage() {
       if (isGuestMode) {
         const localService = noteService as LocalNoteService;
         localService.createNote({
-          user_id: "guest",
           title: data.title,
           content: data.content,
           tags: data.tags,
@@ -190,7 +189,7 @@ export default function NotesPage() {
         if (updatedNote) {
           setNotes(localService.getNotes());
           toast.success(
-            updatedNote.is_pinned ? "Note pinned!" : "Note unpinned!"
+            (updatedNote as Note).is_pinned ? "Note pinned!" : "Note unpinned!"
           );
         }
       } else {
@@ -198,11 +197,13 @@ export default function NotesPage() {
         const updatedNote = await service.togglePin(id);
 
         setNotes((prev) =>
-          prev.map((note) => (note.id === id ? updatedNote : note))
+          prev.map((note) => (note.id === id ? updatedNote as Note : note))
         );
-        toast.success(
-          updatedNote.is_pinned ? "Note pinned!" : "Note unpinned!"
-        );
+        if (updatedNote) {
+          toast.success(
+            (updatedNote as Note).is_pinned ? "Note pinned!" : "Note unpinned!"
+          );
+        }
       }
     } catch (error: unknown) {
       const message =

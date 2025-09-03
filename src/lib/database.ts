@@ -1,25 +1,14 @@
 import { createClient } from "./supabase-client";
-import { Database, RealtimePostgresChangesPayload } from "./supabase";
+import { Database } from "./supabase";
+import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 
 export type Task = Database["public"]["Tables"]["tasks"]["Row"];
 export type TaskInsert = Database["public"]["Tables"]["tasks"]["Insert"];
 export type TaskUpdate = Database["public"]["Tables"]["tasks"]["Update"];
 
-export type Note = {
-  id: string;
-  user_id: string;
-  title: string;
-  content: string;
-  tags: string[] | null;
-  is_pinned: boolean;
-  created_at: string;
-  updated_at: string;
-};
-
-export type NoteInsert = Omit<Note, "id" | "created_at" | "updated_at">;
-export type NoteUpdate = Partial<
-  Omit<Note, "id" | "user_id" | "created_at" | "updated_at">
->;
+export type Note = Database["public"]["Tables"]["notes"]["Row"];
+export type NoteInsert = Database["public"]["Tables"]["notes"]["Insert"];
+export type NoteUpdate = Database["public"]["Tables"]["notes"]["Update"];
 
 export class TaskService {
   private supabase = createClient();
@@ -34,7 +23,7 @@ export class TaskService {
       query.eq("user_id", userId);
     }
 
-    const { data, error } = await query;
+    const { data, error } = await query as { data: Task[] | null, error: Error | null };
 
     if (error) throw error;
     return data;
@@ -51,9 +40,10 @@ export class TaskService {
     return data;
   }
 
-  async createTask(task: Omit<TaskInsert, "id" | "created_at" | "updated_at">) {
+  async createTask(task: TaskInsert) {
     const { data, error } = await this.supabase
       .from("tasks")
+      // @ts-expect-error: Supabase type inference issue
       .insert(task)
       .select()
       .single();
@@ -65,6 +55,7 @@ export class TaskService {
   async updateTask(id: string, updates: TaskUpdate) {
     const { data, error } = await this.supabase
       .from("tasks")
+      // @ts-expect-error: Supabase type inference issue
       .update(updates)
       .eq("id", id)
       .select()
@@ -91,7 +82,7 @@ export class TaskService {
       query.eq("user_id", userId);
     }
 
-    const { data, error } = await query;
+    const { data, error } = await query as { data: Task[] | null, error: Error | null };
 
     if (error) throw error;
     return data;
@@ -108,7 +99,7 @@ export class TaskService {
       query.eq("user_id", userId);
     }
 
-    const { data, error } = await query;
+    const { data, error } = await query as { data: Task[] | null, error: Error | null };
 
     if (error) throw error;
     return data;
@@ -125,7 +116,7 @@ export class TaskService {
       query.eq("user_id", userId);
     }
 
-    const { data, error } = await query;
+    const { data, error } = await query as { data: Task[] | null, error: Error | null };
 
     if (error) throw error;
     return data;
@@ -138,7 +129,7 @@ export class TaskService {
       query.eq("user_id", userId);
     }
 
-    const { data, error } = await query;
+    const { data, error } = await query as { data: Task[] | null, error: Error | null };
 
     if (error) throw error;
 
@@ -187,10 +178,10 @@ export class NoteService {
       query.eq("user_id", userId);
     }
 
-    const { data, error } = await query;
+    const { data, error } = await query as { data: Note[] | null, error: Error | null };
 
     if (error) throw error;
-    return data as Note[];
+    return data;
   }
 
   async getNoteById(id: string) {
@@ -198,33 +189,35 @@ export class NoteService {
       .from("notes")
       .select("*")
       .eq("id", id)
-      .single();
+      .single() as { data: Note | null, error: Error | null };
 
     if (error) throw error;
-    return data as Note;
+    return data;
   }
 
   async createNote(note: NoteInsert) {
     const { data, error } = await this.supabase
       .from("notes")
+      // @ts-expect-error: Supabase type inference issue
       .insert(note)
       .select()
       .single();
 
     if (error) throw error;
-    return data as Note;
+    return data;
   }
 
   async updateNote(id: string, updates: NoteUpdate) {
     const { data, error } = await this.supabase
       .from("notes")
+      // @ts-expect-error: Supabase type inference issue
       .update(updates)
       .eq("id", id)
       .select()
       .single();
 
     if (error) throw error;
-    return data as Note;
+    return data;
   }
 
   async deleteNote(id: string) {
@@ -244,10 +237,10 @@ export class NoteService {
       query.eq("user_id", userId);
     }
 
-    const { data, error } = await query;
+    const { data, error } = await query as { data: Note[] | null, error: Error | null };
 
     if (error) throw error;
-    return data as Note[];
+    return data;
   }
 
   async getNotesByTag(tag: string, userId?: string) {
@@ -261,14 +254,15 @@ export class NoteService {
       query.eq("user_id", userId);
     }
 
-    const { data, error } = await query;
+    const { data, error } = await query as { data: Note[] | null, error: Error | null };
 
     if (error) throw error;
-    return data as Note[];
+    return data;
   }
 
   async togglePin(id: string) {
     const note = await this.getNoteById(id);
+    if (!note) return;
     return this.updateNote(id, { is_pinned: !note.is_pinned });
   }
 
@@ -305,16 +299,22 @@ export class LocalTaskService {
   }
 
   saveTasks(tasks: Task[]) {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined") return ;
 
     localStorage.setItem(this.storageKey, JSON.stringify(tasks));
   }
 
-  createTask(task: Omit<Task, "id" | "created_at" | "updated_at">): Task {
+  createTask(task: Omit<Task, "id" | "created_at" | "updated_at" | "user_id">): Task {
     const tasks = this.getTasks();
     const newTask: Task = {
       ...task,
       id: crypto.randomUUID(),
+      user_id: "",
+      status: "pending",
+      category: null,
+      priority: null,
+      due_date: null,
+      description: null,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
@@ -398,11 +398,14 @@ export class LocalNoteService {
     localStorage.setItem(this.storageKey, JSON.stringify(notes));
   }
 
-  createNote(note: Omit<Note, "id" | "created_at" | "updated_at">): Note {
+  createNote(note: Omit<Note, "id" | "created_at" | "updated_at" | "user_id">): Note {
     const notes = this.getNotes();
     const newNote: Note = {
       ...note,
       id: crypto.randomUUID(),
+      user_id: "",
+      is_pinned: false,
+      tags: [],
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
@@ -471,3 +474,5 @@ export class LocalNoteService {
     return notes[index];
   }
 }
+
+

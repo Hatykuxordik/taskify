@@ -1,48 +1,49 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { Header } from "@/components/layout/header"
-import { UnifiedSearch } from "@/components/shared/unified-search"
-import { Task, Note } from "@/lib/database"
-import { createClient } from "@/lib/supabase-client"
-import { User } from "@supabase/supabase-js"
+import { Suspense } from "react";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Header } from "@/components/layout/header";
+import { UnifiedSearch } from "@/components/shared/unified-search";
+import { Task, Note } from "@/lib/database";
+import { createClient } from "@/lib/supabase-client";
+import { User } from "@supabase/supabase-js";
 
-export default function SearchPage() {
-  const [user, setUser] = useState<User | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const supabase = createClient()
+function SearchPage() {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const supabase = createClient();
 
   useEffect(() => {
     const initializeAuth = async () => {
-      const guestMode = localStorage.getItem("taskify_mode") === "guest"
+      const guestMode = localStorage.getItem("taskify_mode") === "guest";
 
       if (!guestMode) {
-        const { data: { user } } = await supabase.auth.getUser()
+        const { data: { user } } = await supabase.auth.getUser();
         
         if (!user) {
-          router.push("/login")
-          return
+          router.push("/login");
+          return;
         }
 
-        setUser(user)
+        setUser(user);
       }
       
-      setIsLoading(false)
-    }
+      setIsLoading(false);
+    };
 
-    initializeAuth()
-  }, [router, supabase])
+    initializeAuth();
+  }, [router, supabase]);
 
   const handleTaskSelect = (task: Task) => {
-    router.push(`/dashboard?task=${task.id}`)
-  }
+    router.push(`/dashboard?task=${task.id}`);
+  };
 
   const handleNoteSelect = (note: Note) => {
-    router.push(`/notes?note=${note.id}`)
-  }
+    router.push(`/notes?note=${note.id}`);
+  };
 
   if (isLoading) {
     return (
@@ -57,7 +58,7 @@ export default function SearchPage() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -111,6 +112,15 @@ export default function SearchPage() {
         </div>
       </main>
     </div>
-  )
+  );
 }
+
+export default function Search() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SearchPage />
+    </Suspense>
+  );
+}
+
 

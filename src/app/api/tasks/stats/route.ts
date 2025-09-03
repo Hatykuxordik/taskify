@@ -11,13 +11,12 @@ interface TaskStats {
   total: number;
   completed: number;
   pending: number;
-  overdue: number;
-  byCategory?: Record<string, number>;
+  inProgress: number;
 }
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const {
       data: { user },
       error: authError,

@@ -1,38 +1,38 @@
 @import "tailwindcss";
 
 :root {
-  --background: 0 0% 100%;
+  --background: 210 100% 97.5%;
   --foreground: 222.2 84% 4.9%;
-  --card: 0 0% 100%;
+  --card: 210 100% 98%;
   --card-foreground: 222.2 84% 4.9%;
-  --popover: 0 0% 100%;
+  --popover: 210 100% 98%;
   --popover-foreground: 222.2 84% 4.9%;
-  --primary: 336.6 95.4% 65.7%;
+  --primary: 217.6 91.2% 59.8%;
   --primary-foreground: 210 40% 98%;
-  --secondary: 222.4 100.0% 65.9%;
+  --secondary: 220 14.3% 95.9%;
   --secondary-foreground: 222.2 84% 4.9%;
-  --muted: 210 40% 96%;
-  --muted-foreground: 215.4 16.3% 46.9%;
-  --accent: 210 40% 96%;
-  --accent-foreground: 222.2 84% 4.9%;
-  --destructive: 0 84.2% 60.2%;
+  --muted: 210 20% 90%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --accent: 217.2 32.6% 17.5%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62.8% 30.6%;
   --destructive-foreground: 210 40% 98%;
   --border: 214.3 31.8% 91.4%;
   --input: 214.3 31.8% 91.4%;
-  --ring: 221.2 83.2% 53.3%;
+  --ring: 217.2 91.2% 59.8%;
   --radius: 0.5rem;
 }
 
 .dark {
   --background: 222.2 84% 4.9%;
   --foreground: 210 40% 98%;
-  --card: 222.2 84% 4.9%;
+  --card: 222.2 84% 14%;
   --card-foreground: 210 40% 98%;
-  --popover: 222.2 84% 4.9%;
+  --popover: 222.2 84% 14%;
   --popover-foreground: 210 40% 98%;
-  --primary: 336.6 95.4% 65.7%;
-  --primary-foreground: 222.2 84% 4.9%;
-  --secondary: 222.4 100.0% 65.9%;
+  --primary: 217.6 91.2% 59.8%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 215 27.9% 16.9%;
   --secondary-foreground: 210 40% 98%;
   --muted: 217.2 32.6% 17.5%;
   --muted-foreground: 215 20.2% 65.1%;
@@ -42,7 +42,7 @@
   --destructive-foreground: 210 40% 98%;
   --border: 217.2 32.6% 17.5%;
   --input: 217.2 32.6% 17.5%;
-  --ring: 224.3 76.3% 94.1%;
+  --ring: 217.6 91.2% 59.8%;
 }
 
 * {
@@ -53,3 +53,110 @@ body {
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
 }
+
+/* Professional animations and transitions */
+*:not(button):not(a):not([role="button"]) {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Smooth hover effects for interactive elements */
+button, a, [role="button"] {
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button:hover:not(:disabled), a:hover, [role="button"]:hover {
+  transform: translateY(-1px);
+}
+
+/* Card hover effects */
+.card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Focus states for accessibility */
+button:focus-visible, 
+input:focus-visible, 
+textarea:focus-visible, 
+select:focus-visible,
+a:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* Button press effect */
+button:active:not(:disabled), [role="button"]:active {
+  transform: translateY(0px) scale(0.98);
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --border: 0 0% 0%;
+    --ring: 0 0% 0%;
+  }
+  
+  .dark {
+    --border: 0 0% 100%;
+    --ring: 0 0% 100%;
+  }
+}
+
+/* Reduced motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+
+/* Loading animations */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Prevent animation conflicts */
+.animate-fade-in * {
+  animation: none;
+}
+

@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase-server";
-import { Database } from "@/lib/supabase";
-
-// Define the shape of updateData using Supabase's Database type
-type NoteUpdateData = Database["public"]["Tables"]["notes"]["Update"];
 
 // Define the context type to match Next.js expectations
 interface RouteContext {
@@ -13,7 +9,7 @@ interface RouteContext {
 // GET handler: Fetch a single note by ID
 export async function GET(request: NextRequest, context: RouteContext) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Resolve params if it's a Promise
     const params = await (context.params instanceof Promise
@@ -61,7 +57,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
 // PUT handler: Update a note by ID
 export async function PUT(request: NextRequest, context: RouteContext) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Resolve params if it's a Promise
     const params = await (context.params instanceof Promise
@@ -81,17 +77,18 @@ export async function PUT(request: NextRequest, context: RouteContext) {
     const body = await request.json();
     const { title, content, tags, is_pinned } = body;
 
-    // Construct updateData with type annotation
-    const updateData: NoteUpdateData = {
-      ...(title !== undefined && { title }),
-      ...(content !== undefined && { content }),
-      ...(tags !== undefined && { tags }),
-      ...(is_pinned !== undefined && { is_pinned }),
-    };
+    // Create update object with only defined values
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const updates: Record<string, any> = {};
+    if (title !== undefined) updates.title = title;
+    if (content !== undefined) updates.content = content;
+    if (tags !== undefined) updates.tags = tags;
+    if (is_pinned !== undefined) updates.is_pinned = is_pinned;
 
-    const { data: note, error } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: note, error } = await (supabase as any)
       .from("notes")
-      .update(updateData)
+      .update(updates)
       .eq("id", params.id)
       .eq("user_id", user.id)
       .select()
@@ -121,7 +118,7 @@ export async function PUT(request: NextRequest, context: RouteContext) {
 // DELETE handler: Delete a note by ID
 export async function DELETE(request: NextRequest, context: RouteContext) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Resolve params if it's a Promise
     const params = await (context.params instanceof Promise
