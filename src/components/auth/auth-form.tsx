@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { createClient } from "@/lib/supabase-client";
 import toast from "react-hot-toast";
 import Image from "next/image";
+import { Eye, EyeOff } from "lucide-react";
 
 interface AuthFormProps {
   mode: "login" | "signup";
@@ -23,6 +24,8 @@ interface FormData {
 
 export function AuthForm({ mode }: AuthFormProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
@@ -159,18 +162,31 @@ export function AuthForm({ mode }: AuthFormProps) {
 
             <div>
               <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                {...register("password", {
-                  required: "Password is required",
-                  minLength: {
-                    value: 6,
-                    message: "Password must be at least 6 characters",
-                  },
-                })}
-                className="mt-1"
-              />
+              <div className="relative mt-1">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  {...register("password", {
+                    required: "Password is required",
+                    minLength: {
+                      value: 6,
+                      message: "Password must be at least 6 characters",
+                    },
+                  })}
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4 text-gray-400" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-gray-400" />
+                  )}
+                </button>
+              </div>
               {errors.password && (
                 <p className="text-red-500 text-sm mt-1">
                   {errors.password.message}
@@ -181,16 +197,29 @@ export function AuthForm({ mode }: AuthFormProps) {
             {mode === "signup" && (
               <div>
                 <Label htmlFor="confirmPassword">Confirm Password</Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  {...register("confirmPassword", {
-                    required: "Please confirm your password",
-                    validate: (value) =>
-                      value === password || "Passwords do not match",
-                  })}
-                  className="mt-1"
-                />
+                <div className="relative mt-1">
+                  <Input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    {...register("confirmPassword", {
+                      required: "Please confirm your password",
+                      validate: (value) =>
+                        value === password || "Passwords do not match",
+                    })}
+                    className="pr-10"
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-4 w-4 text-gray-400" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-gray-400" />
+                    )}
+                  </button>
+                </div>
                 {errors.confirmPassword && (
                   <p className="text-red-500 text-sm mt-1">
                     {errors.confirmPassword.message}

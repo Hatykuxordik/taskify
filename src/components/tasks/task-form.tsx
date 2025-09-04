@@ -36,6 +36,7 @@ export function TaskForm({
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<TaskFormData>({
     defaultValues: {
@@ -49,6 +50,11 @@ export function TaskForm({
       priority: task?.priority || null,
     },
   });
+
+  const formatDescription = (text: string) => {
+    if (!text) return text;
+    return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+  };
 
   useEffect(() => {
     if (task) {
@@ -100,9 +106,13 @@ export function TaskForm({
             <Textarea
               id="description"
               {...register("description")}
-              className="mt-1 capitalize"
+              className="mt-1"
               placeholder="Enter task description (optional)"
               rows={3}
+              onChange={(e) => {
+                const formatted = formatDescription(e.target.value);
+                setValue("description", formatted);
+              }}
             />
           </div>
 
