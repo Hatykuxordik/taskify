@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase-server";
 
+
 // Define the context type to match Next.js expectations
 interface RouteContext {
   params: { id: string } | Promise<{ id: string }>;

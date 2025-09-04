@@ -39,7 +39,8 @@ export async function middleware(request: NextRequest) {
   const isGuestMode = request.cookies.get('taskify_mode')?.value === 'guest' || 
                      request.nextUrl.pathname === '/dashboard' ||
                      request.nextUrl.pathname === '/notes' ||
-                     request.nextUrl.pathname === '/search'
+                     request.nextUrl.pathname === '/search' ||
+                     request.nextUrl.pathname === '/analytics'
 
   if (
     !user &&

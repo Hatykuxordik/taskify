@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase-server";
 import type { Database } from "@/lib/supabase";
 
+
 // Define table row type (from supabase types)
 type Note = Database["public"]["Tables"]["notes"]["Row"];
 
