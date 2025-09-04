@@ -5,7 +5,7 @@
 ### 1. Access Your Supabase Project
 
 - Log in to [Supabase Dashboard](https://supabase.com)
-- Navigate to your project using the URL: `https://nohkflhdjuhflonzevzd.supabase.co`
+- Navigate to your project using the URL: `https://*******.supabase.co`
 
 ### 2. Create Tasks Table
 
@@ -99,7 +99,7 @@ CREATE POLICY "Users can delete their own shares" ON task_shares
    - Create a new project or use existing one
    - Enable Google+ API
    - Create OAuth 2.0 credentials
-   - Add authorized redirect URIs: `https://nohkflhdjuhflonzevzd.supabase.co/auth/v1/callback`
+   - Add authorized redirect URIs: `https://**********************.supabase.co/auth/v1/callback`
 
 ### 5. Enable Realtime (Optional)
 
