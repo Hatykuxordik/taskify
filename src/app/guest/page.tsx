@@ -10,8 +10,10 @@ export default function GuestPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Set guest mode in localStorage
+    // Set guest mode in localStorage and cookie (for middleware)
     localStorage.setItem("taskify_mode", "guest");
+    // 1 year, path=/ so middleware can read it on all routes, Lax for safety
+    document.cookie = "taskify_mode=guest; path=/; max-age=31536000; samesite=lax";
     toast.success("Welcome! You're using Taskify in guest mode.");
   }, []);
 
